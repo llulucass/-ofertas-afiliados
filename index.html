@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ofertas Afiliados</title>
+<style>
+:root{--bg:#f5f6f8;--card:#fff;--text:#171717;--muted:#707070;--line:#e4e4e7}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--text)}
+.app{max-width:1000px;margin:auto;padding:18px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:15px}
+.brand h1{margin:0;font-size:25px}.brand p{margin:4px 0;color:var(--muted);font-size:13px}
+.tabs{display:flex;gap:8px;overflow:auto;margin-bottom:14px}.tab{white-space:nowrap;border:1px solid var(--line);background:#fff;padding:11px 15px;border-radius:12px;font-weight:800;cursor:pointer}.tab.active{background:#111;color:#fff}
+.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:15px}.card{background:var(--card);border-radius:18px;padding:18px;box-shadow:0 5px 25px #00000008;margin-bottom:15px}
+h2{font-size:17px;margin:0 0 12px}label{display:block;font-weight:750;font-size:13px;margin:13px 0 6px}
+input,textarea,select{width:100%;border:1px solid var(--line);border-radius:11px;padding:12px;font:inherit;background:#fff}textarea{min-height:220px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}button{border:0;border-radius:11px;padding:12px 15px;font-weight:800;cursor:pointer}.primary{background:#111;color:#fff}.green{background:#25d366;color:#fff}.soft{background:#eee}.danger{background:#ffe7e7}
+.actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}.pill{display:inline-block;padding:5px 8px;border-radius:99px;background:#eee;font-size:12px;color:#555}
+.list{display:grid;gap:8px}.item{border:1px solid var(--line);border-radius:12px;padding:11px;font-size:13px}.item b{display:block;margin-bottom:4px}.empty{color:var(--muted);font-size:13px}
+.note{font-size:12px;line-height:1.5;color:#666;background:#f7f7f8;padding:10px;border-radius:10px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.row{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}}
+</style></head>
+<body><div class="app">
+<div class="top"><div class="brand"><h1>🛒 Ofertas Afiliados</h1><p>Seu painel para criar e divulgar ofertas por plataforma.</p></div><span class="pill" id="platformLabel">Shopee</span></div>
+
+<div class="tabs">
+<button class="tab active" data-p="Shopee" onclick="setPlatform('Shopee',this)">🟠 Shopee</button>
+<button class="tab" data-p="Amazon" onclick="setPlatform('Amazon',this)">🟡 Amazon</button>
+<button class="tab" data-p="Mercado Livre" onclick="setPlatform('Mercado Livre',this)">🟢 Mercado Livre</button>
+</div>
+
+<div class="grid">
+<main>
+<div class="card">
+<h2>🔗 Criar oferta</h2>
+<label>Link do produto</label><input id="url" placeholder="Cole o link aqui">
+<div class="row">
+<div><label>Nome do produto</label><input id="product" placeholder="Ex.: Fone Bluetooth"></div>
+<div><label>Preço</label><input id="price" placeholder="R$ 99,90"></div>
+</div>
+<div class="row">
+<div><label>Preço anterior</label><input id="old" placeholder="Opcional"></div>
+<div><label>Desconto</label><input id="discount" placeholder="Ex.: 35% OFF"></div>
+</div>
+<label>Link de afiliado</label><input id="affiliate" placeholder="Será preenchido pela integração oficial">
+<div class="actions"><button class="primary" onclick="generate()">GERAR OFERTA</button><button class="soft" onclick="clearForm()">LIMPAR</button></div>
+<p class="note" id="integrationNote"></p>
+</div>
+
+<div class="card">
+<h2>📲 Mensagem</h2>
+<textarea id="message" placeholder="A oferta aparecerá aqui..."></textarea>
+<div class="actions"><button class="green" onclick="openWA()">ABRIR NO WHATSAPP</button><button class="soft" onclick="copyMsg()">COPIAR</button></div>
+</div>
+</main>
+
+<aside>
+<div class="card">
+<h2>⚙️ Configurações</h2>
+<label>SubID / campanha</label><input id="subid" placeholder="Ex.: grupo_whatsapp">
+<label>Canal</label><select id="channel"><option>WhatsApp</option><option>Instagram</option><option>TikTok</option><option>Telegram</option></select>
+<div class="actions"><button class="primary" onclick="saveConfig()">SALVAR CONFIGURAÇÃO</button></div>
+<p class="note">As credenciais privadas das plataformas deverão ficar no servidor quando as integrações forem conectadas. Não coloque Secret/Token aqui.</p>
+</div>
+
+<div class="card"><h2>🕘 Histórico</h2><div id="history" class="list"></div></div>
+</aside>
+</div></div>
+
+<script>
+let platform='Shopee';
+const configs=JSON.parse(localStorage.getItem('affiliate_configs')||'{}');
+const history=JSON.parse(localStorage.getItem('affiliate_history')||'[]');
+
+function setPlatform(p,el){
+ platform=p; document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); el.classList.add('active');
+ document.getElementById('platformLabel').textContent=p; updateNote();
+}
+function updateNote(){
+ const n=document.getElementById('integrationNote');
+ if(platform==='Shopee') n.textContent='Shopee: conversão automática será conectada após a liberação da Open API da sua conta.';
+ if(platform==='Amazon') n.textContent='Amazon: integração deve usar as ferramentas/API oficiais e respeitar os requisitos do programa de Associados.';
+ if(platform==='Mercado Livre') n.textContent='Mercado Livre: geração do link deve usar as ferramentas oficiais do programa de Afiliados.';
+}
+function v(id){return document.getElementById(id).value.trim()}
+function generate(){
+ const product=v('product')||'Oferta '+platform, price=v('price')||'Confira o preço', old=v('old'), d=v('discount'), link=v('affiliate')||v('url'), sub=v('subid');
+ let m=`🔥 OFERTA ${platform.toUpperCase()} 🔥\\n\\n🛒 ${product}\\n`;
+ if(old)m+=`💰 De ${old} `;
+ m+=`por ${price}`; if(d)m+=` • ${d}`;
+ m+=`\\n\\n👉 COMPRAR AQUI:\\n${link}`;
+ if(sub)m+=`\\n\\n🏷️ ${sub}`;
+ m+=`\\n\\n⚠️ Preço e disponibilidade podem mudar na plataforma.`;
+ document.getElementById('message').value=m;
+ history.unshift({platform,product,price,when:new Date().toLocaleString('pt-BR')});
+ localStorage.setItem('affiliate_history',JSON.stringify(history.slice(0,30))); renderHistory();
+}
+function renderHistory(){
+ const box=document.getElementById('history');
+ if(!history.length){box.innerHTML='<div class="empty">Nenhuma oferta criada ainda.</div>';return}
+ box.innerHTML=history.slice(0,8).map(x=>`<div class="item"><b>${x.platform} — ${escapeHtml(x.product)}</b>${escapeHtml(x.price)}<br><span class="empty">${x.when}</span></div>`).join('');
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function copyMsg(){navigator.clipboard.writeText(v('message')).then(()=>alert('Oferta copiada!'))}
+function openWA(){window.open('https://wa.me/?text='+encodeURIComponent(v('message')),'_blank')}
+function clearForm(){['url','product','price','old','discount','affiliate','message'].forEach(id=>document.getElementById(id).value='')}
+function saveConfig(){configs[platform]={subid:v('subid'),channel:v('channel')};localStorage.setItem('affiliate_configs',JSON.stringify(configs));alert('Configuração salva neste navegador.')}
+updateNote();renderHistory();
+</script></body></html>
