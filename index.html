@@ -89,9 +89,13 @@ function detectPlatform(url){
    return 'Amazon';
  }
 
- if(u.includes('mercadolivre.com.br') || u.includes('mercadolibre.com')){
-   return 'Mercado Livre';
- }
+ if(
+  u.includes('mercadolivre.com.br') ||
+  u.includes('mercadolibre.com') ||
+  u.includes('meli.la')
+){
+  return 'Mercado Livre';
+}
 
  if(u.includes('shopee.com.br') || u.includes('shopee')){
    return 'Shopee';
