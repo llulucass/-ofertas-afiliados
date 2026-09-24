@@ -81,16 +81,49 @@ function updateNote(){
 }
 function v(id){return document.getElementById(id).value.trim()}
 function generate(){
- const product=v('product')||'Oferta '+platform, price=v('price')||'Confira o preço', old=v('old'), d=v('discount'), link=v('affiliate')||v('url'), sub=v('subid');
- let m=`🔥 OFERTA ${platform.toUpperCase()} 🔥\\n\\n🛒 ${product}\\n`;
- if(old)m+=`💰 De ${old} `;
- m+=`por ${price}`; if(d)m+=` • ${d}`;
- m+=`\\n\\n👉 COMPRAR AQUI:\\n${link}`;
- if(sub)m+=`\\n\\n🏷️ ${sub}`;
- m+=`\\n\\n⚠️ Preço e disponibilidade podem mudar na plataforma.`;
+ const product=v('product')||'Oferta '+platform;
+ const price=v('price')||'Confira o preço';
+ const old=v('old');
+ const d=v('discount');
+ const link=v('affiliate')||v('url');
+ const sub=v('subid');
+
+ let m=`🔥 OFERTA ${platform.toUpperCase()} 🔥\n\n`;
+ m+=`🛒 ${product}\n\n`;
+
+ if(old){
+   m+=`💰 De ${old} por ${price}\n`;
+ }else{
+   m+=`💰 Por ${price}\n`;
+ }
+
+ if(d){
+   m+=`🔥 ${d}\n`;
+ }
+
+ m+=`\n👉 COMPRAR AQUI:\n${link}`;
+
+ if(sub){
+   m+=`\n\n🏷️ ${sub}`;
+ }
+
+ m+=`\n\n⚠️ Preço e disponibilidade podem mudar na plataforma.`;
+
  document.getElementById('message').value=m;
- history.unshift({platform,product,price,when:new Date().toLocaleString('pt-BR')});
- localStorage.setItem('affiliate_history',JSON.stringify(history.slice(0,30))); renderHistory();
+
+ history.unshift({
+   platform,
+   product,
+   price,
+   when:new Date().toLocaleString('pt-BR')
+ });
+
+ localStorage.setItem(
+   'affiliate_history',
+   JSON.stringify(history.slice(0,30))
+ );
+
+ renderHistory();
 }
 function renderHistory(){
  const box=document.getElementById('history');
