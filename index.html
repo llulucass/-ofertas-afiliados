@@ -70,8 +70,34 @@ const configs=JSON.parse(localStorage.getItem('affiliate_configs')||'{}');
 const history=JSON.parse(localStorage.getItem('affiliate_history')||'[]');
 
 function setPlatform(p,el){
- platform=p; document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); el.classList.add('active');
- document.getElementById('platformLabel').textContent=p; updateNote();
+ platform=p;
+
+ document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+
+ if(el){
+   el.classList.add('active');
+ }
+
+ document.getElementById('platformLabel').textContent=p;
+ updateNote();
+}
+
+function detectPlatform(url){
+ const u=url.toLowerCase();
+
+ if(u.includes('amazon.com.br') || u.includes('amzn.to') || u.includes('link.amazon')){
+   return 'Amazon';
+ }
+
+ if(u.includes('mercadolivre.com.br') || u.includes('mercadolibre.com')){
+   return 'Mercado Livre';
+ }
+
+ if(u.includes('shopee.com.br') || u.includes('shopee')){
+   return 'Shopee';
+ }
+
+ return null;
 }
 function updateNote(){
  const n=document.getElementById('integrationNote');
@@ -80,7 +106,20 @@ function updateNote(){
  if(platform==='Mercado Livre') n.textContent='Mercado Livre: geração do link deve usar as ferramentas oficiais do programa de Afiliados.';
 }
 function v(id){return document.getElementById(id).value.trim()}
+ 
+ document.getElementById('url').addEventListener('input',function(){
+ const detected=detectPlatform(this.value);
+
+ if(!detected) return;
+
+ const tab=document.querySelector(`.tab[data-p="${detected}"]`);
+
+ if(tab){
+   setPlatform(detected,tab);
+ }
+});
 function generate(){
+ 
  const product=v('product')||'Oferta '+platform;
  const price=v('price')||'Confira o preço';
  const old=v('old');
