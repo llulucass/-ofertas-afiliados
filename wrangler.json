@@ -5,5 +5,11 @@
   "assets": {
     "directory": ".",
     "binding": "ASSETS"
-  }
+  },
+  "kv_namespaces": [
+    {
+      "binding": "ML_TOKENS",
+      "id": "c00c9dda67eb4e24b8e4ee05cb4409a0"
+    }
+  ]
 }
