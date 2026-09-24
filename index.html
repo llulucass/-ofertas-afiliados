@@ -85,7 +85,8 @@ function generate(){
  const price=v('price')||'Confira o preço';
  const old=v('old');
  const d=v('discount');
- const link=v('affiliate')||v('url');
+let link=v('affiliate')||v('url');
+ 
  const sub=v('subid');
 
  let m=`🔥 OFERTA ${platform.toUpperCase()} 🔥\n\n`;
